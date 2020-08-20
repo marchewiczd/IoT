@@ -1,0 +1,17 @@
+﻿@page "/sensors"
+
+<h1>Sensors</h1>
+
+<p>Current count: @currentCount</p>
+
+<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+
+@code {
+    private int currentCount = 0;
+
+    private void IncrementCount()
+    {
+        currentCount++;
+        Console.WriteLine($"Sensor increased by 1 to {currentCount}!");
+    }
+}
