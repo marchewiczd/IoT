@@ -8,6 +8,8 @@ using Radzen;
 using System;
 using System.Threading;
 using System.Diagnostics;
+using System.IO;
+using System.Linq;
 
 namespace IoT_RaspberryServer
 {
@@ -28,6 +30,12 @@ namespace IoT_RaspberryServer
             {
                 Console.WriteLine("Debug Mode!");
                 LoadTempData();
+
+                AppSettings.OpenWeatherApiKey = Configuration["apiKeys:openWeatherApiKey"];
+            }
+            else
+            {
+                AppSettings.OpenWeatherApiKey = File.ReadLines(".apiKey").First();
             }
 
             services.AddRazorPages();
@@ -36,8 +44,6 @@ namespace IoT_RaspberryServer
             services.AddScoped<DialogService>();
             services.AddScoped<NotificationService>();
             
-            // Load secrets
-            AppSettings.OpenWeatherApiKey = Configuration["apiKeys:openWeatherApiKey"];
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -323,3 +323,9 @@ ASALocalRun/
 
 # Temp project files
 temp/
+
+
+
+
+# Custom
+.apiKey

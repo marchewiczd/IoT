@@ -6,7 +6,7 @@
 @inject DialogService dialogService
 
     <div class="row">
-        <RadzenButton Style="margin-top: 40px;" Text=@($"Dodaj/usun zraszacz") Click="@(args => dialogService.Open<AddSprinkleDialog>($"Add new sprinkler", null, new DialogOptions(){ Width = "700px", Height = "370px" }))" />
+        <RadzenButton Style="margin-top: 40px;" Text=@($"Dodaj/usun zraszacz") Click="@(args => dialogService.Open<Dialog.AddSprinkleDialog>($"Add new sprinkler", null, new DialogOptions(){ Width = "700px", Height = "370px" }))" />
 
         @if (Debugger.IsAttached)
         {
@@ -23,7 +23,7 @@
                     <div>Opis:</div>
                     <b>@sprinkle.Description</b>
                     <br />
-                    <RadzenButton Style="margin-top: 40px;" Text=@($"Dodaj/usun podlewanie") Click="@(args => dialogService.Open<ModSprinkleDialog>($"Sprinkler ID: {sprinkle.Id}",
+                    <RadzenButton Style="margin-top: 40px;" Text=@($"Dodaj/usun podlewanie") Click="@(args => dialogService.Open<Dialog.ModSprinkleDialog>($"Sprinkler ID: {sprinkle.Id}",
                             new Dictionary<string, object>() { { "SprinklerId", sprinkle.Id } },
                             new DialogOptions(){ Width = "700px", Height = "550px" }))" />
                     <br />
