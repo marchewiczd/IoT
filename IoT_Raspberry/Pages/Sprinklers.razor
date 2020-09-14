@@ -1,4 +1,119 @@
 ﻿@page "/sprinklers"
 
-<h1>Sprinklers</h1>
-<div class="spinner" />
+@using System.Diagnostics;
+@using Data;
+
+@inject DialogService dialogService
+
+    <div class="row">
+        <RadzenButton Style="margin-top: 40px;" Text=@($"Dodaj/usun zraszacz") Click="@(args => dialogService.Open<AddSprinkleDialog>($"Add new sprinkler", null, new DialogOptions(){ Width = "700px", Height = "370px" }))" />
+
+        @if (Debugger.IsAttached)
+        {
+            <RadzenButton Style="margin-top: 40px; margin-left: 20px" Text=@($"Clear all saved sprinklers") Click="@(args => ClearSprinkles())" />
+        }
+    </div>
+<hr>
+<div class="row">
+    @foreach (var sprinkle in Data.Sprinklers)
+    {
+        <RadzenCard Style="width:48%;height:300px;margin-right:2%;margin-top:2%">
+            <div class="row">
+                <div class="col-md-6">
+                    <div>Opis:</div>
+                    <b>@sprinkle.Description</b>
+                    <br />
+                    <RadzenButton Style="margin-top: 40px;" Text=@($"Dodaj/usun podlewanie") Click="@(args => dialogService.Open<ModSprinkleDialog>($"Sprinkler ID: {sprinkle.Id}",
+                            new Dictionary<string, object>() { { "SprinklerId", sprinkle.Id } },
+                            new DialogOptions(){ Width = "700px", Height = "550px" }))" />
+                    <br />
+                    <RadzenButton Click="@(args => ToggleSprinkler(@sprinkle))" Text="On/off" Style="margin-top: 20px; width: 150px" />
+                    <br />
+                    <RadzenButton Icon="delete_forever" Click="@(args => DeleteSprinkler(@sprinkle))" ButtonStyle="ButtonStyle.Warning" Text="Usun" Style="margin-top: 20px; width: 150px" />
+                </div>
+                <div class="col-md-6">
+                    @if (sprinkle.SprinkleTimeDict.Any())
+                    {
+                        <div>Nastepne podlewanie:</div>
+                        <b>@($"{sprinkle.SprinkleTimeDict.First().Key:HH:mm:ss}")</b> <!-- TODO: fix to show actual next sprinkle -->
+                        <div style="margin-top:20px">Czas nastepnego podlewania:</div>
+                        <b>@($"{sprinkle.SprinkleTimeDict.First().Value} min")</b> <!-- TODO: fix to show actual next sprinkle -->
+                        <div style="margin-top:20px">Ostatnie udane podlewanie:</div>
+                        <b>@($"{sprinkle.LastSuccessfulSprinkle:HH:mm:ss}")</b>
+                    }
+                    else
+                    {
+                        <div>Nastepne podlewanie:</div>
+                        <b style="color:red">No sprinkles defined</b>
+                        <div style="margin-top:20px">Czas nastepnego podlewania:</div>
+                        <b style="color:red">No sprinkles defined</b>
+                        <div style="margin-top:20px">Ostatnie udane podlewanie:</div>
+                        <b style="color:red">No sprinkles defined</b>
+                    }
+
+                    <div style="margin-top:20px">Status:</div>
+                    <b style="@(sprinkle.SprinkleStatus ? "color:green" : "color:red")">@ParseStatus(sprinkle.SprinkleStatus)</b>
+
+                </div>
+            </div>
+        </RadzenCard>
+    }
+</div>
+
+@code {
+    protected override void OnInitialized()
+    {
+        dialogService.OnOpen += Open;
+        dialogService.OnClose += Close;
+    }
+
+    string ParseStatus(bool sprinkleStatus)
+    {
+        return sprinkleStatus ? "On" : "Off";
+    }
+
+    void ToggleSprinkler(Sprinkler sprinkler)
+    {
+        sprinkler.SprinkleStatus = sprinkler.SprinkleStatus ? false : true;
+        StateHasChanged();
+    }
+
+    void ClearSprinkles()
+    {
+        Data.Sprinklers.Clear();
+    }
+
+    async void DeleteSprinkler(Sprinkler sprinkler)
+    {
+
+        bool? result = await dialogService.Confirm("Are you sure?", "Delete", new ConfirmOptions() { OkButtonText = "Yes", CancelButtonText = "No" });
+
+        if (result == true)
+        {
+            Data.Sprinklers.Remove(sprinkler);
+            StateHasChanged();
+        }
+    }
+
+    void Change(string text)
+    {
+        StateHasChanged();
+    }
+
+    void Click(MouseEventArgs args, string buttonName)
+    {
+        StateHasChanged();
+    }
+
+    int SprinklerId = 1;
+
+    void Open(string title, Type type, Dictionary<string, object> parameters, DialogOptions options)
+    {
+        StateHasChanged();
+    }
+
+    void Close(dynamic result)
+    {
+        StateHasChanged();
+    }
+}

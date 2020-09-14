@@ -1,6 +1,6 @@
 using System;
 
-namespace IoT_Raspberry.Data
+namespace IoT_RaspberryServer.Data
 {
     public class WeatherForecast
     {

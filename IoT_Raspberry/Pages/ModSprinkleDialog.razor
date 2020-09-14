@@ -1,0 +1,154 @@
+﻿@page "/modsprinkler/{SprinklerId}"
+
+@using Data;
+
+@inject DialogService dialogService
+@inject NotificationService notificationService
+
+
+<RadzenCard Style="margin-bottom: 20px; height: 375px">
+    <div class="row" style="height:85%">
+        <div class="col-md-6">
+            <div>Opis:</div>
+            <b>@sprinkler.Description</b>
+            <br />
+            <br />
+            <div>Pin GPIO:</div>
+            <b>@sprinkler.GpioPin</b>
+            <br />
+            <br />
+            <div>Godzina:</div>
+            <RadzenDatePicker @bind-Value="sprinkleTime" TValue="DateTime" ShowTime="true" TimeOnly="true" ShowSeconds="true" DateFormat="HH:mm:ss" Change="@(args => Change())" />
+            <div>Czas(w minutach):</div>
+            <RadzenNumeric @bind-Value="sprinkleLength" TValue="uint" Max="60" Min="1" Step="5" Style="margin-bottom: 20px" Change="@(args => Change())" />
+            <!-- buttons -->
+            <RadzenButton Click="@(args => Add())" Text="Add" Style="margin-top: 20px; width: 125px" />
+            <RadzenButton Click="@(args => DeleteSelected())" Text="Delete" Style="margin-top: 20px; width: 125px" />
+        </div>
+        <div class="col-md-6">
+            @if (sprinkler.SprinkleTimeDict.Any())
+            {
+                <RadzenListBox Multiple="true" @bind-Value="@multipleValues" Data="@parsedDateTime.Keys" Style="margin-bottom: 20px;height:100%;width:100%;" Change="@(args => Change())" />
+            }
+            else
+            {
+                <b style="color:red">No sprinkles defined</b>
+            }
+        </div>
+    </div>
+</RadzenCard>
+<div class="row">
+    <div class="col-md-12">
+        <RadzenButton Click="@((args) => dialogService.Close(true))" Text="OK" Style="margin-bottom: 10px; width: 150px" />
+    </div>
+</div>
+
+@code {
+    [Parameter] public ulong SprinklerId { get; set; }
+
+    int popupDurationMs = 10000;
+
+    Sprinkler sprinkler;
+    uint sprinkleLength;
+    DateTime sprinkleTime;
+    Dictionary<string, DateTime> parsedDateTime = new Dictionary<string, DateTime>();
+
+    protected override void OnInitialized()
+    {
+        sprinkler = Data.Sprinklers.Find(spr => spr.Id == SprinklerId);
+        ParseDateTime();
+    }
+
+    IEnumerable<string> multipleValues = new List<string>();
+    DateTime value = new DateTime();
+
+    Dictionary<DateTime, string> events = new Dictionary<DateTime, string>();
+
+    void Change()
+    {
+        StateHasChanged();
+    }
+
+    void DeleteSelected()
+    {
+        if (!multipleValues.Any())
+        {
+            ShowNotification(new NotificationMessage() { Severity = NotificationSeverity.Warning, Summary = "Uwaga!", Detail = "Brak elementow do usuniecia. Sprawdz czy zostaly zaznaczone elementy do usuniecia z listy obok.", Duration = popupDurationMs });
+            return;
+        }
+
+        foreach (var value in multipleValues)
+        {
+            DateTime key;
+            parsedDateTime.TryGetValue(value, out key);
+            sprinkler.SprinkleTimeDict.Remove(key);
+            parsedDateTime.Remove(value);
+        }
+
+        ShowNotification(new NotificationMessage() { Severity = NotificationSeverity.Success, Summary = "Sukces!", Detail = "Element zostal usuniety!", Duration = popupDurationMs });
+        multipleValues = new List<string>();
+
+        StateHasChanged();
+    }
+
+    void Add()
+    {
+        if (sprinkleLength != null
+            && sprinkleLength > 1
+            && sprinkleTime != null
+            && sprinkleTime.Ticks > 0)
+        {
+            if (!parsedDateTime.ContainsKey(sprinkleTime.ToString("HH:mm:ss")))
+            {
+                sprinkler.SprinkleTimeDict.Add((DateTime)sprinkleTime, (uint)sprinkleLength);
+                parsedDateTime.Add(sprinkleTime.ToString("HH:mm:ss"), sprinkleTime);
+            }
+            else
+            {
+                ShowNotification(new NotificationMessage() { Severity = NotificationSeverity.Warning, Summary = "Uwaga!", Detail = "Taki wpis juz istnieje! Nie mozesz dodac takiego samego czasu kilkukrotnie.", Duration = popupDurationMs });
+                return;
+            }
+        }
+        else
+        {
+            ShowNotification(new NotificationMessage() { Severity = NotificationSeverity.Error, Summary = "Blad!", Detail = "Czas nie zostal podany! Sprawdz czy podales(as) czas i dlugosc zraszania.", Duration = popupDurationMs });
+            return;
+        }
+
+        ShowNotification(new NotificationMessage() { Severity = NotificationSeverity.Success, Summary = "Sukces!\n", Detail = "Nowy czas zostal dodany", Duration = popupDurationMs });
+
+        StateHasChanged();
+    }
+
+    DateTime? dateValue = DateTime.Now;
+
+    IEnumerable<DateTime> dates = new DateTime[] { DateTime.Today.AddDays(-1), DateTime.Today.AddDays(1) };
+    void DateRenderSpecial(DateRenderEventArgs args)
+    {
+        if (dates.Contains(args.Date))
+        {
+            args.Attributes.Add("style", "background-color: #ff6d41; border-color: white;");
+        }
+    }
+
+    void DateRender(DateRenderEventArgs args)
+    {
+        args.Disabled = dates.Contains(args.Date);
+    }
+
+    async Task ShowNotification(NotificationMessage message)
+    {
+        notificationService.Notify(message);
+
+        events.Add(DateTime.Now, $"{message.Severity} notification");
+        await InvokeAsync(() => { StateHasChanged(); });
+    }
+
+    void ParseDateTime()
+    {
+        foreach(var date in sprinkler.SprinkleTimeDict)
+        {
+            parsedDateTime.Add(date.Key.ToString("HH:mm:ss"), date.Key);
+        }
+    }
+}

@@ -1,16 +1,15 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using IoT_Raspberry.Data;
+using IoT_RaspberryServer.Data;
+using Radzen;
+using System;
+using System.Threading;
+using System.Diagnostics;
 
-namespace IoT_Raspberry
+namespace IoT_RaspberryServer
 {
     public class Startup
     {
@@ -25,10 +24,18 @@ namespace IoT_Raspberry
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            if (Debugger.IsAttached)
+            {
+                Console.WriteLine("Debug Mode!");
+                LoadTempData();
+            }
+
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddSingleton<WeatherForecastService>();
-
+            services.AddScoped<DialogService>();
+            services.AddScoped<NotificationService>();
+            
             // Load secrets
             AppSettings.OpenWeatherApiKey = Configuration["apiKeys:openWeatherApiKey"];
         }
@@ -54,6 +61,25 @@ namespace IoT_Raspberry
                 endpoints.MapBlazorHub();
                 endpoints.MapFallbackToPage("/_Host");
             });
+        }
+
+        private void LoadTempData()
+        {
+            for (int i = 0; i < 10; i++)
+            {
+                IoT_RaspberryServer.Data.Data.Sprinklers.Add(new Sprinkler
+                {
+                    Description = "Im a sprinkler test123",
+                    GpioPin = 123,
+                    LastSuccessfulSprinkle = new DateTime(2020, 9, 14, 14, 56, 12),
+                    SkipNextSprinkle = false,
+                    SprinkleStatus = false
+                });
+
+                IoT_RaspberryServer.Data.Data.Sprinklers[i].SprinkleTimeDict.Add(new DateTime(2020, 9, 14, 14, 56, 12), 13);
+                IoT_RaspberryServer.Data.Data.Sprinklers[i].SprinkleTimeDict.Add(new DateTime(2020, 9, 14, 15, 15, 12), 13);
+                Thread.Sleep(10);
+            }
         }
     }
 }

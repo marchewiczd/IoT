@@ -1,0 +1,75 @@
+﻿@page "/addsprinkler"
+
+@using Data;
+
+@inject DialogService dialogService
+@inject NotificationService notificationService
+
+
+<RadzenCard Style="margin-bottom: 20px;">
+    <div class="row">
+        <div class="col-md-6">
+            <div>Opis:</div>
+            <RadzenTextBox @bind-Value="@desc" Style="margin-bottom: 20px" Change="@(args => Change())" />
+            <div>GPIO Pin:</div>
+            <RadzenNumeric @bind-Value="@gpioPin" TValue="int" Style="margin-bottom: 20px" Change="@(args => Change())" />
+        </div>
+    </div>
+</RadzenCard>
+<div class="row">
+    <div class="col-md-12">
+        <RadzenButton Click="@((args) => Accept())" Text="OK" Style="margin-bottom: 10px; width: 150px" />
+        <RadzenButton Click="@((args) => dialogService.Close(false))" ButtonStyle="ButtonStyle.Secondary" Text="Cancel" Style="margin-bottom: 10px; width: 150px" />
+    </div>
+</div>
+
+@code {
+
+        string desc = string.Empty;
+        int gpioPin = -1;
+        int popupDurationMs = 10000;
+
+    protected override void OnInitialized()
+    {
+    }
+
+    void Change()
+    {
+        StateHasChanged();
+    }
+
+    void Accept()
+    {
+        if (desc == string.Empty)
+        {
+            ShowNotification(new NotificationMessage() { Severity = NotificationSeverity.Error, Summary = "Blad!\n", Detail = "Brak opisu", Duration = popupDurationMs });
+            return;
+        }
+
+        if(gpioPin == -1)
+        {
+            ShowNotification(new NotificationMessage() { Severity = NotificationSeverity.Error, Summary = "Blad!\n", Detail = "Brak numeru pinu GPIO", Duration = popupDurationMs });
+            return;
+        }
+
+        if (Data.Sprinklers.Find(x => x.GpioPin == gpioPin) != null)
+        {
+            ShowNotification(new NotificationMessage() { Severity = NotificationSeverity.Error, Summary = "Blad!\n", Detail = $"Pin {gpioPin} jest juz zajety!", Duration = popupDurationMs });
+            return;
+        }
+
+        Data.Sprinklers.Add(new Sprinkler()
+        {
+            Description = desc,
+            GpioPin = gpioPin
+        });
+
+        dialogService.Close(true);
+    }
+
+    async Task ShowNotification(NotificationMessage message)
+    {
+        notificationService.Notify(message);
+        await InvokeAsync(() => { StateHasChanged(); });
+    }
+}

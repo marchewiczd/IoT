@@ -6,8 +6,9 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using IoT_Api.Helpers;
 
-namespace IoT_Raspberry.Data
+namespace IoT_RaspberryServer.Data
 {
     public class WeatherForecastService
     {
@@ -18,7 +19,6 @@ namespace IoT_Raspberry.Data
 
         public List<WeatherForecast> GetForecast()
         {
-            DateTime dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
             List<WeatherForecast> forecastList = new List<WeatherForecast>();
             string json = this.GetWeatherJsonData().Result;
 
@@ -28,7 +28,7 @@ namespace IoT_Raspberry.Data
             {
                 forecastList.Add(new WeatherForecast
                 {
-                    Date = dtDateTime.AddSeconds((double)hourForecast.dt.Value).ToLocalTime(),
+                    Date = DateTimeHelpers.ConvertFromUnixTime((double)hourForecast.dt.Value),
                     FeelsLikeTemp = (double)hourForecast.feels_like.Value,
                     Humidity = (double)hourForecast.humidity.Value,
                     Pressure = (int)hourForecast.pressure.Value,
@@ -41,6 +41,10 @@ namespace IoT_Raspberry.Data
 
             return forecastList;
         }
+
+        public List<WeatherForecast> Forecasts = new List<WeatherForecast>();
+
+        public string LastUpdateTime { get; private set; }
 
         //todo: there's no need to download new forecast every time if they're already up to date.
         //example would be if someone clicks between hourly/daily the same hour or if someone loads the page again in the same hour.
@@ -72,7 +76,6 @@ namespace IoT_Raspberry.Data
 
         public List<WeatherForecast> GetHourlyForecast()
         {
-            DateTime dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
             List<WeatherForecast> forecastList = new List<WeatherForecast>();
             string json = this.GetWeatherJsonData().Result;
 
@@ -82,7 +85,7 @@ namespace IoT_Raspberry.Data
             {
                 forecastList.Add(new WeatherForecast
                 {
-                    Date = dtDateTime.AddSeconds((double)hourForecast.dt.Value).ToLocalTime(),
+                    Date = DateTimeHelpers.ConvertFromUnixTime((double)hourForecast.dt.Value),
                     FeelsLikeTemp = (double)hourForecast.feels_like.Value,
                     Humidity = (double)hourForecast.humidity.Value,
                     Pressure = (int)hourForecast.pressure.Value,
@@ -138,7 +141,6 @@ namespace IoT_Raspberry.Data
 
         public List<WeatherForecast> GetDailyForecast()
         {
-            DateTime dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
             List<WeatherForecast> forecastList = new List<WeatherForecast>();
             string json = this.GetWeatherJsonData().Result;
 
@@ -148,7 +150,7 @@ namespace IoT_Raspberry.Data
             {
                 forecastList.Add(new WeatherForecast
                 {
-                    Date = dtDateTime.AddSeconds((double)dailyForecast.dt.Value).ToLocalTime(),
+                    Date = DateTimeHelpers.ConvertFromUnixTime((double)dailyForecast.dt.Value),
                     FeelsLikeTemp = (double)dailyForecast.feels_like.day.Value,
                     Humidity = (double)dailyForecast.humidity.Value,
                     Pressure = (int)dailyForecast.pressure.Value,

@@ -84,7 +84,7 @@ Your raspberry should be now available under **raspberry.local**.
 Next two sections are borrowed from [edi.wang](https://edi.wang/post/2019/9/29/setup-net-core-30-runtime-and-sdk-on-raspberry-pi-4 "edi.wang"). If you'd like to know more about specific steps please refer to the guide on that website.
 
 - Create separate folder for your .NET files: `mkdir dotnet_arm64`
-- Download .NET Core SDK and ASP.NET Core Runtime from [microsoft.com](http://https://dotnet.microsoft.com/download/dotnet-core/3.1 "microsoft.com"). Example: `wget https://download.visualstudio.microsoft.com/download/pr/5d8bf507-759a-4cc6-92ae-8ef63478398a/6b298aad0f6ce04ebc09daa1007a4248/aspnetcore-runtime-3.1.7-linux-arm64.tar.gz`
+- Download .NET Core SDK and ASP.NET Core Runtime from [microsoft.com](https://dotnet.microsoft.com/download/dotnet-core/3.1 "microsoft.com"). Example: `wget https://download.visualstudio.microsoft.com/download/pr/5d8bf507-759a-4cc6-92ae-8ef63478398a/6b298aad0f6ce04ebc09daa1007a4248/aspnetcore-runtime-3.1.7-linux-arm64.tar.gz`
 - Unpack files to folder created earlier, for example: `tar zxf dotnet-sdk-3.1.401-linux-arm64.tar.gz -C /home/ubuntu/dotnet_arm64`. Both should go to the same folder.
 - Enter the user(e.g. /home/ubuntu/) folder and edit .profile file: `nano .profile`. Paste the following at the end:
 
