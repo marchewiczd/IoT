@@ -1,8 +1,10 @@
 ﻿using LiteDB;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace IoT_Api.Database
 {
-    public class LiteDb<DataType>
+    public class LiteDb<T>
     {
         private string _connectionString;
 
@@ -11,11 +13,11 @@ namespace IoT_Api.Database
             this._connectionString = connectionString;
         }
 
-        public void Insert(DataType data)
+        public void Insert(T data)
         {
             using (var db = new LiteDatabase(_connectionString))
             {
-                db.GetCollection<DataType>().Insert(data);
+                db.GetCollection<T>().Insert(data);
             }
         }
 
@@ -23,23 +25,39 @@ namespace IoT_Api.Database
         {
             using (var db = new LiteDatabase(_connectionString))
             {
-                db.GetCollection<DataType>().Delete(id);
+                db.GetCollection<T>().Delete(id);
             }
         }
 
-        public DataType SelectById(ulong id)
+        public void DeleteAll()
         {
             using (var db = new LiteDatabase(_connectionString))
             {
-                return db.GetCollection<DataType>().FindById(id);
+                db.GetCollection<T>().DeleteAll();
             }
         }
 
-        public void UpdateData(DataType newData)
+        public List<T> GetAll()
         {
             using (var db = new LiteDatabase(_connectionString))
             {
-                db.GetCollection<DataType>().Update(newData);
+                return db.GetCollection<T>().FindAll().ToList();
+            }
+        }
+
+        public T GetById(ulong id)
+        {
+            using (var db = new LiteDatabase(_connectionString))
+            {
+                return db.GetCollection<T>().FindById(id);
+            }
+        }
+
+        public void UpdateData(T newData)
+        {
+            using (var db = new LiteDatabase(_connectionString))
+            {
+                db.GetCollection<T>().Update(newData);
             }
         }
     }

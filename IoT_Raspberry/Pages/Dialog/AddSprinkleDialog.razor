@@ -1,10 +1,11 @@
 ﻿@page "/addsprinkler"
 
 @using Data;
+@using Services;
 
 @inject DialogService dialogService
 @inject NotificationService notificationService
-
+@inject SprinklerService sprinklerService
 
 <RadzenCard Style="margin-bottom: 20px;">
     <div class="row">
@@ -25,9 +26,9 @@
 
 @code {
 
-        string desc = string.Empty;
-        int gpioPin = -1;
-        int popupDurationMs = 10000;
+    string desc = string.Empty;
+    int gpioPin = 0;
+    int popupDurationMs = 10000;
 
     protected override void OnInitialized()
     {
@@ -46,12 +47,12 @@
             return;
         }
 
-        if(gpioPin == -1)
+        if (gpioPin == 0)
         {
             ShowNotification(new NotificationMessage() { Severity = NotificationSeverity.Error, Summary = "Blad!\n", Detail = "Brak numeru pinu GPIO", Duration = popupDurationMs });
             return;
         }
-
+        
         if (Data.Sprinklers.Find(x => x.GpioPin == gpioPin) != null)
         {
             ShowNotification(new NotificationMessage() { Severity = NotificationSeverity.Error, Summary = "Blad!\n", Detail = $"Pin {gpioPin} jest juz zajety!", Duration = popupDurationMs });
