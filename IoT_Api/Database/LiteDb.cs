@@ -1,6 +1,6 @@
 ﻿using LiteDB;
 
-namespace IoDataType_Api.Database
+namespace IoT_Api.Database
 {
     public class LiteDb<DataType>
     {

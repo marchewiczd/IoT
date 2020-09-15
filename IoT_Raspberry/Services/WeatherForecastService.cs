@@ -7,8 +7,9 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using IoT_Api.Helpers;
+using IoT_RaspberryServer.Data;
 
-namespace IoT_RaspberryServer.Data
+namespace IoT_RaspberryServer.Services
 {
     public class WeatherForecastService
     {
