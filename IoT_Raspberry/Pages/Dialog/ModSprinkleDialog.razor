@@ -1,9 +1,11 @@
 ﻿@page "/modsprinkler/{SprinklerId}"
 
 @using Data;
+@using Services;
 
 @inject DialogService dialogService
 @inject NotificationService notificationService
+@inject SprinklerService sprinklerService
 
 
 <RadzenCard Style="margin-bottom: 20px; height: 375px">
@@ -55,14 +57,11 @@
 
     protected override void OnInitialized()
     {
-        sprinkler = Data.Sprinklers.Find(spr => spr.Id == SprinklerId);
+        sprinkler = sprinklerService.Sprinklers.Find(spr => spr.Id == SprinklerId);
         ParseDateTime();
     }
 
     IEnumerable<string> multipleValues = new List<string>();
-    DateTime value = new DateTime();
-
-    Dictionary<DateTime, string> events = new Dictionary<DateTime, string>();
 
     void Change()
     {
@@ -81,7 +80,7 @@
         {
             DateTime key;
             parsedDateTime.TryGetValue(value, out key);
-            sprinkler.SprinkleTimeDict.Remove(key);
+            sprinklerService.DeleteSprinkleTime(sprinkler, key);
             parsedDateTime.Remove(value);
         }
 
@@ -100,7 +99,7 @@
         {
             if (!parsedDateTime.ContainsKey(sprinkleTime.ToString("HH:mm:ss")))
             {
-                sprinkler.SprinkleTimeDict.Add((DateTime)sprinkleTime, (uint)sprinkleLength);
+                sprinklerService.AddSprinkleTime(sprinkler, (DateTime)sprinkleTime, (uint)sprinkleLength);
                 parsedDateTime.Add(sprinkleTime.ToString("HH:mm:ss"), sprinkleTime);
             }
             else
@@ -120,33 +119,15 @@
         StateHasChanged();
     }
 
-    DateTime? dateValue = DateTime.Now;
-
-    IEnumerable<DateTime> dates = new DateTime[] { DateTime.Today.AddDays(-1), DateTime.Today.AddDays(1) };
-    void DateRenderSpecial(DateRenderEventArgs args)
-    {
-        if (dates.Contains(args.Date))
-        {
-            args.Attributes.Add("style", "background-color: #ff6d41; border-color: white;");
-        }
-    }
-
-    void DateRender(DateRenderEventArgs args)
-    {
-        args.Disabled = dates.Contains(args.Date);
-    }
-
     async Task ShowNotification(NotificationMessage message)
     {
         notificationService.Notify(message);
-
-        events.Add(DateTime.Now, $"{message.Severity} notification");
         await InvokeAsync(() => { StateHasChanged(); });
     }
 
     void ParseDateTime()
     {
-        foreach(var date in sprinkler.SprinkleTimeDict)
+        foreach (var date in sprinkler.SprinkleTimeDict)
         {
             parsedDateTime.Add(date.Key.ToString("HH:mm:ss"), date.Key);
         }

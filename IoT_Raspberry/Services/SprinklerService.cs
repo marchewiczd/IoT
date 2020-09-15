@@ -1,5 +1,6 @@
 ﻿using IoT_Api.Database;
 using IoT_RaspberryServer.Data;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -35,17 +36,33 @@ namespace IoT_RaspberryServer.Services
             this.Sprinklers = this._liteDb.GetAll();
         }
 
-        public Sprinkler FindByGpio(int gpioPin)
-        {
-            return this.Sprinklers.Find(x => x.GpioPin == gpioPin);
-        }
-
         public void DeleteSprinkler(Sprinkler sprinkler)
         {
             this._liteDb.Delete(sprinkler.Id);
             this.Sprinklers = this._liteDb.GetAll();
         }
-        
+
+        public void DeleteSprinkleTime(Sprinkler sprinkler, DateTime key)
+        {
+            sprinkler.SprinkleTimeDict.Remove(key);
+            this._liteDb.UpdateData(sprinkler);
+            this.Sprinklers = this._liteDb.GetAll();
+        }
+
+        public void AddSprinkleTime(Sprinkler sprinkler, DateTime key, uint value)
+        {
+            sprinkler.SprinkleTimeDict.Add(key, value);
+            this._liteDb.UpdateData(sprinkler);
+            this.Sprinklers = this._liteDb.GetAll();
+        }
+
+        public void AddSprinkleTime(Sprinkler sprinkler, KeyValuePair<DateTime, uint> keyValuePair)
+        {
+            sprinkler.SprinkleTimeDict.Add(keyValuePair.Key, keyValuePair.Value);
+            this._liteDb.UpdateData(sprinkler);
+            this.Sprinklers = this._liteDb.GetAll();
+        }
+
         public void DeleteSprinkler(ulong id)
         {
             this._liteDb.Delete(id);

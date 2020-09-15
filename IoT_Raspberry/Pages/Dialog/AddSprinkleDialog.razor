@@ -53,7 +53,7 @@
             return;
         }
 
-        if (sprinklerService.FindByGpio(gpioPin) != null)
+        if (sprinklerService.Sprinklers.Find(x => x.GpioPin == gpioPin) != null)
         {
             ShowNotification(new NotificationMessage() { Severity = NotificationSeverity.Error, Summary = "Blad!\n", Detail = $"Pin {gpioPin} jest juz zajety!", Duration = popupDurationMs });
             return;
