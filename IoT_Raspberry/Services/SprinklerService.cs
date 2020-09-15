@@ -35,6 +35,11 @@ namespace IoT_RaspberryServer.Services
             this.Sprinklers = this._liteDb.GetAll();
         }
 
+        public Sprinkler FindByGpio(int gpioPin)
+        {
+            return this.Sprinklers.Find(x => x.GpioPin == gpioPin);
+        }
+
         public void DeleteSprinkler(Sprinkler sprinkler)
         {
             this._liteDb.Delete(sprinkler.Id);

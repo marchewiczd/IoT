@@ -53,6 +53,14 @@ namespace IoT_Api.Database
             }
         }
 
+        public T GetUsingPredicate(BsonExpression predicate)
+        {
+            using (var db = new LiteDatabase(_connectionString))
+            {
+                return db.GetCollection<T>().FindOne(predicate);
+            }
+        }
+
         public void UpdateData(T newData)
         {
             using (var db = new LiteDatabase(_connectionString))

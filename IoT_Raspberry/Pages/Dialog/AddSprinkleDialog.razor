@@ -52,14 +52,14 @@
             ShowNotification(new NotificationMessage() { Severity = NotificationSeverity.Error, Summary = "Blad!\n", Detail = "Brak numeru pinu GPIO", Duration = popupDurationMs });
             return;
         }
-        
-        if (Data.Sprinklers.Find(x => x.GpioPin == gpioPin) != null)
+
+        if (sprinklerService.FindByGpio(gpioPin) != null)
         {
             ShowNotification(new NotificationMessage() { Severity = NotificationSeverity.Error, Summary = "Blad!\n", Detail = $"Pin {gpioPin} jest juz zajety!", Duration = popupDurationMs });
             return;
         }
 
-        Data.Sprinklers.Add(new Sprinkler()
+        sprinklerService.AddSprinkler(new Sprinkler()
         {
             Description = desc,
             GpioPin = gpioPin
