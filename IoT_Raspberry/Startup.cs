@@ -10,6 +10,7 @@ using System.Threading;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using IoT_RaspberryServer.Services;
 
 namespace IoT_RaspberryServer
 {
@@ -17,33 +18,32 @@ namespace IoT_RaspberryServer
     {
         public Startup(IConfiguration configuration)
         {
-            Configuration = configuration;
-        }
-
-        public IConfiguration Configuration { get; }
-
-        // This method gets called by the runtime. Use this method to add services to the container.
-        // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
-        public void ConfigureServices(IServiceCollection services)
-        {
             if (Debugger.IsAttached)
             {
-                Console.WriteLine("Debug Mode!");
                 LoadTempData();
 
-                AppSettings.OpenWeatherApiKey = Configuration["apiKeys:openWeatherApiKey"];
+                AppSettings.OpenWeatherApiKey = configuration["apiKeys:openWeatherApiKey"];
             }
             else
             {
                 AppSettings.OpenWeatherApiKey = File.ReadLines(".apiKey").First();
             }
+        }
 
+        // This method gets called by the runtime. Use this method to add services to the container.
+        // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
+        public void ConfigureServices(IServiceCollection services)
+        {
             services.AddRazorPages();
             services.AddServerSideBlazor();
-            services.AddSingleton<WeatherForecastService>();
+
+            // Radzen services
             services.AddScoped<DialogService>();
             services.AddScoped<NotificationService>();
-            
+
+            // Project services
+            services.AddSingleton<WeatherForecastService>();
+            services.AddSingleton<SprinklerService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -73,7 +73,7 @@ namespace IoT_RaspberryServer
         {
             for (int i = 0; i < 10; i++)
             {
-                IoT_RaspberryServer.Data.Data.Sprinklers.Add(new Sprinkler
+                Data.Data.Sprinklers.Add(new Sprinkler
                 {
                     Description = "Im a sprinkler test123",
                     GpioPin = 123,
@@ -82,8 +82,8 @@ namespace IoT_RaspberryServer
                     SprinkleStatus = false
                 });
 
-                IoT_RaspberryServer.Data.Data.Sprinklers[i].SprinkleTimeDict.Add(new DateTime(2020, 9, 14, 14, 56, 12), 13);
-                IoT_RaspberryServer.Data.Data.Sprinklers[i].SprinkleTimeDict.Add(new DateTime(2020, 9, 14, 15, 15, 12), 13);
+                Data.Data.Sprinklers[i].SprinkleTimeDict.Add(new DateTime(2020, 9, 14, 14, 56, 12), 13);
+                Data.Data.Sprinklers[i].SprinkleTimeDict.Add(new DateTime(2020, 9, 14, 15, 15, 12), 13);
                 Thread.Sleep(10);
             }
         }

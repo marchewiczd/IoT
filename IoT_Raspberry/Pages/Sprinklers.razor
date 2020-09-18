@@ -1,21 +1,24 @@
 ﻿@page "/sprinklers"
 
 @using System.Diagnostics;
+
 @using Data;
+@using Services;
 
 @inject DialogService dialogService
+@inject SprinklerService sprinklerService 
 
     <div class="row">
         <RadzenButton Style="margin-top: 40px;" Text=@($"Dodaj/usun zraszacz") Click="@(args => dialogService.Open<Dialog.AddSprinkleDialog>($"Add new sprinkler", null, new DialogOptions(){ Width = "700px", Height = "370px" }))" />
 
         @if (Debugger.IsAttached)
         {
-            <RadzenButton Style="margin-top: 40px; margin-left: 20px" Text=@($"Clear all saved sprinklers") Click="@(args => ClearSprinkles())" />
+            <RadzenButton Style="margin-top: 40px; margin-left: 20px" Text=@($"Clear all saved sprinklers") Click="@(args => sprinklerService.ClearSprinklers())" />
         }
     </div>
 <hr>
 <div class="row">
-    @foreach (var sprinkle in Data.Sprinklers)
+    @foreach (var sprinkle in sprinklerService.Sprinklers)
     {
         <RadzenCard Style="width:48%;height:300px;margin-right:2%;margin-top:2%">
             <div class="row">
@@ -27,7 +30,11 @@
                             new Dictionary<string, object>() { { "SprinklerId", sprinkle.Id } },
                             new DialogOptions(){ Width = "700px", Height = "550px" }))" />
                     <br />
-                    <RadzenButton Click="@(args => ToggleSprinkler(@sprinkle))" Text="On/off" Style="margin-top: 20px; width: 150px" />
+                    <RadzenButton Click="@(args => 
+                                           { 
+                                                sprinklerService.ToggleSprinkler(@sprinkle);
+                                                StateHasChanged();
+                                           })" Text="On/off" Style="margin-top: 20px; width: 150px" />
                     <br />
                     <RadzenButton Icon="delete_forever" Click="@(args => DeleteSprinkler(@sprinkle))" ButtonStyle="ButtonStyle.Warning" Text="Usun" Style="margin-top: 20px; width: 150px" />
                 </div>
@@ -65,6 +72,14 @@
     {
         dialogService.OnOpen += Open;
         dialogService.OnClose += Close;
+
+        if (Debugger.IsAttached && !sprinklerService.Sprinklers.Any())
+        {
+            foreach(var entry in Data.Sprinklers)
+            {
+                sprinklerService.AddSprinkler(entry);
+            }
+        }
     }
 
     string ParseStatus(bool sprinkleStatus)
@@ -72,25 +87,13 @@
         return sprinkleStatus ? "On" : "Off";
     }
 
-    void ToggleSprinkler(Sprinkler sprinkler)
-    {
-        sprinkler.SprinkleStatus = sprinkler.SprinkleStatus ? false : true;
-        StateHasChanged();
-    }
-
-    void ClearSprinkles()
-    {
-        Data.Sprinklers.Clear();
-    }
-
     async void DeleteSprinkler(Sprinkler sprinkler)
     {
-
         bool? result = await dialogService.Confirm("Are you sure?", "Delete", new ConfirmOptions() { OkButtonText = "Yes", CancelButtonText = "No" });
 
         if (result == true)
         {
-            Data.Sprinklers.Remove(sprinkler);
+            sprinklerService.DeleteSprinkler(sprinkler);
             StateHasChanged();
         }
     }
@@ -99,13 +102,6 @@
     {
         StateHasChanged();
     }
-
-    void Click(MouseEventArgs args, string buttonName)
-    {
-        StateHasChanged();
-    }
-
-    int SprinklerId = 1;
 
     void Open(string title, Type type, Dictionary<string, object> parameters, DialogOptions options)
     {
