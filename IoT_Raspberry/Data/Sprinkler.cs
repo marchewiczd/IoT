@@ -19,10 +19,6 @@ namespace IoT_RaspberryServer.Data
 
         public string Description { get; set; }
 
-        /// <summary>
-        /// datetime: sprinkle time
-        /// uint: sprinkle length
-        /// </summary>
         public List<SprinklerDateTime> SprinkleTimeList { get; set; }
 
         public DateTime LastSuccessfulSprinkle { get; set; }
