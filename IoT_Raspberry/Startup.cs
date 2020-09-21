@@ -82,8 +82,18 @@ namespace IoT_RaspberryServer
                     SprinkleStatus = false
                 });
 
-                Data.Data.Sprinklers[i].SprinkleTimeDict.Add(new DateTime(2020, 9, 14, 14, 56, 12), 13);
-                Data.Data.Sprinklers[i].SprinkleTimeDict.Add(new DateTime(2020, 9, 14, 15, 15, 12), 13);
+                Data.Data.Sprinklers[i].SprinkleTimeList.Add(new SprinklerDateTime
+                {
+                    WateringDateTime = new DateTime(2020, 9, 14, 14, 56, 12),
+                    WateringDuration = 13
+                });
+
+                Data.Data.Sprinklers[i].SprinkleTimeList.Add(new SprinklerDateTime
+                {
+                    WateringDateTime = new DateTime(2020, 9, 14, 14, 56, 12),
+                    WateringDuration = 13
+                });
+
                 Thread.Sleep(10);
             }
         }

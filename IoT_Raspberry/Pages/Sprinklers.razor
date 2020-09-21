@@ -34,6 +34,7 @@
                                            { 
                                                 sprinklerService.ToggleSprinkler(@sprinkle);
                                                 StateHasChanged();
+<<<<<<< Updated upstream
                                            })" Text="On/off" Style="margin-top: 20px; width: 150px" />
                     <br />
                     <RadzenButton Icon="delete_forever" Click="@(args => DeleteSprinkler(@sprinkle))" ButtonStyle="ButtonStyle.Warning" Text="Usun" Style="margin-top: 20px; width: 150px" />
@@ -60,6 +61,34 @@
 
                     <div style="margin-top:20px">Status:</div>
                     <b style="@(sprinkle.SprinkleStatus ? "color:green" : "color:red")">@ParseStatus(sprinkle.SprinkleStatus)</b>
+=======
+                                           })" Text="@L["OnOff"]" Style="margin-top: 20px; width: 150px" />
+                        <br />
+                        <RadzenButton Icon="delete_forever" Click="@(args => DeleteSprinkler(@sprinkle))" ButtonStyle="ButtonStyle.Warning" Text="@L["Del"]" Style="margin-top: 20px; width: 150px" />
+                    </div>
+                    <div class="col-md-6">
+                        @if (sprinkle.SprinkleTimeList.Any())
+                        {
+                            <div>@L["NextWater"]</div>
+                            <b>@($"{sprinkle.SprinkleTimeList.First().ParsedDateTime}")</b> <!-- TODO: fix to show actual next sprinkle -->
+                            <div style="margin-top:20px">@L["NextDuration"]</div>
+                            <b>@($"{sprinkle.SprinkleTimeList.First().WateringDuration} min")</b> <!-- TODO: fix to show actual next sprinkle -->
+                            <div style="margin-top:20px">@L["LastSuccessful"]</div>
+                            <b>@($"{sprinkle.LastSuccessfulSprinkle:HH:mm:ss}")</b>
+                        }
+                        else
+                        {
+                            <div>@L["NextWater"]</div>
+                            <b style="color:red">@L["NoWatering"]</b>
+                            <div style="margin-top:20px">@L["NextDuration"]</div>
+                            <b style="color:red">@L["NoWatering"]</b>
+                            <div style="margin-top:20px">@L["LastSuccessful"]</div>
+                            <b style="color:red">@L["NoWatering"]</b>
+                        }
+
+                        <div style="margin-top:20px">@L["Status"]</div>
+                        <b style="@(sprinkle.SprinkleStatus ? "color:green" : "color:red")">@ParseStatus(sprinkle.SprinkleStatus)</b>
+>>>>>>> Stashed changes
 
                 </div>
             </div>

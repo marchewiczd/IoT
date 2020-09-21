@@ -8,7 +8,7 @@ namespace IoT_RaspberryServer.Data
         public Sprinkler()
         {
             this.Id = Convert.ToUInt64(DateTime.Now.ToString("yyMMddHHmmssff"));
-            this.SprinkleTimeDict = new Dictionary<DateTime, uint>();
+            this.SprinkleTimeList = new List<SprinklerDateTime>();
             this.SkipNextSprinkle = false;
             this.SprinkleStatus = false;
         }
@@ -23,7 +23,7 @@ namespace IoT_RaspberryServer.Data
         /// datetime: sprinkle time
         /// uint: sprinkle length
         /// </summary>
-        public Dictionary<DateTime, uint> SprinkleTimeDict { get; set; }
+        public List<SprinklerDateTime> SprinkleTimeList { get; set; }
 
         public DateTime LastSuccessfulSprinkle { get; set; }
 
