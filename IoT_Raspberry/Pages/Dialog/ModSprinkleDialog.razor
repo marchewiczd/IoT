@@ -9,7 +9,7 @@
 @inject IStringLocalizer<ModSprinkleDialog> L
 
 
-<RadzenCard Style="margin-bottom: 20px; height: 375px">
+<RadzenCard Style="margin-bottom: 20px; height: 375px;">
     <div class="row" style="height:85%">
         <div class="col-md-6">
             <div>@L["Desc"]</div>
@@ -26,12 +26,17 @@
             <RadzenNumeric @bind-Value="sprinkleLength" TValue="uint" Max="60" Min="1" Step="5" Style="margin-bottom: 20px" Change="@(args => Change())" />
             <!-- buttons -->
             <RadzenButton Click="@(args => Add())" Text="@L["Add"]" Style="margin-top: 20px; width: 125px" />
-            <RadzenButton Click="@(args => DeleteSelected())" Text="@L["Del"]" Style="margin-top: 20px; width: 125px" />
+            <RadzenButton ButtonStyle="ButtonStyle.Warning" Click="@(args => DeleteSelected())" Text="@L["Del"]" Style="margin-top: 20px; width: 125px" />
         </div>
         <div class="col-md-6">
-            @if (sprinkler.SprinkleTimeDict.Any())
+            @if (sprinkler.SprinkleTimeList.Any())
             {
-                <RadzenListBox Multiple="true" @bind-Value="@multipleValues" Data="@parsedDateTime.Keys" Style="margin-bottom: 20px;height:100%;width:100%;" Change="@(args => Change())" />
+                <RadzenGrid RowSelect="@((args) => ChangeSelectedRow(args))" AllowFiltering="false" AllowPaging="false" AllowSorting="false" Data="@sprinkler.SprinkleTimeList" TItem="SprinklerDateTime" Style="margin-bottom: 20px;height:100%;width:100%;">
+                    <Columns>
+                        <RadzenGridColumn Width="70px" TItem="SprinklerDateTime" Property="ParsedDateTime" Title="@L["Time"]" />
+                        <RadzenGridColumn Width="150px" TItem="SprinklerDateTime" Property="WateringDuration" Title="@L["Duration"]" />
+                    </Columns>
+                </RadzenGrid>
             }
             else
             {
@@ -54,40 +59,37 @@
     Sprinkler sprinkler;
     uint sprinkleLength;
     DateTime sprinkleTime;
-    Dictionary<string, DateTime> parsedDateTime = new Dictionary<string, DateTime>();
+    SprinklerDateTime selectedRow;
 
     protected override void OnInitialized()
     {
         sprinkler = sprinklerService.Sprinklers.Find(spr => spr.Id == SprinklerId);
-        ParseDateTime();
     }
-
-    IEnumerable<string> multipleValues = new List<string>();
 
     void Change()
     {
         StateHasChanged();
     }
 
+    void ChangeSelectedRow(SprinklerDateTime dateTime)
+    {
+        selectedRow = dateTime;
+        StateHasChanged();
+    }
+
     void DeleteSelected()
     {
-        if (!multipleValues.Any())
+        if (selectedRow == null)
         {
             ShowNotification(new NotificationMessage() { Severity = NotificationSeverity.Warning, Summary = L["Warn"], Detail = L["DelEmpty"], Duration = popupDurationMs });
             return;
         }
 
-        foreach (var value in multipleValues)
-        {
-            DateTime key;
-            parsedDateTime.TryGetValue(value, out key);
-            sprinklerService.DeleteSprinkleTime(sprinkler, key);
-            parsedDateTime.Remove(value);
-        }
+        sprinklerService.DeleteSprinkleTime(sprinkler, selectedRow);
+        selectedRow = null;
+        sprinkler = sprinklerService.Sprinklers.Find(spr => spr.Id == SprinklerId);
 
         ShowNotification(new NotificationMessage() { Severity = NotificationSeverity.Success, Summary = L["Success"], Detail = L["DelSuccess"], Duration = popupDurationMs });
-        multipleValues = new List<string>();
-
         StateHasChanged();
     }
 
@@ -98,15 +100,14 @@
             && sprinkleTime != null
             && sprinkleTime.Ticks > 0)
         {
-            if (!parsedDateTime.ContainsKey(sprinkleTime.ToString("HH:mm:ss")))
-            {
-                sprinklerService.AddSprinkleTime(sprinkler, (DateTime)sprinkleTime, (uint)sprinkleLength);
-                parsedDateTime.Add(sprinkleTime.ToString("HH:mm:ss"), sprinkleTime);
-            }
-            else
+            if (sprinkler.SprinkleTimeList.Find(x => x.ParsedDateTime == sprinkleTime.ToString("HH:mm:ss")) != null)
             {
                 ShowNotification(new NotificationMessage() { Severity = NotificationSeverity.Warning, Summary = L["Warn"], Detail = L["AlreadyExists"], Duration = popupDurationMs });
                 return;
+            }
+            else
+            {
+                sprinklerService.AddSprinkleTime(sprinkler, (DateTime)sprinkleTime, (uint)sprinkleLength);
             }
         }
         else
@@ -115,8 +116,8 @@
             return;
         }
 
-        ShowNotification(new NotificationMessage() { Severity = NotificationSeverity.Success, Summary = L["Success"], Detail = L["TimeAdded"], Duration = popupDurationMs });
-
+        ShowNotification(new NotificationMessage() { Severity = NotificationSeverity.Success, Summary = L["Success"], Detail = L["TimeAdded"], Duration = popupDurationMs });      
+        sprinkler = sprinklerService.Sprinklers.Find(spr => spr.Id == SprinklerId);
         StateHasChanged();
     }
 
@@ -124,13 +125,5 @@
     {
         notificationService.Notify(message);
         await InvokeAsync(() => { StateHasChanged(); });
-    }
-
-    void ParseDateTime()
-    {
-        foreach (var date in sprinkler.SprinkleTimeDict)
-        {
-            parsedDateTime.Add(date.Key.ToString("HH:mm:ss"), date.Key);
-        }
     }
 }

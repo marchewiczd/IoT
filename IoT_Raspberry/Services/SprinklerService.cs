@@ -42,23 +42,33 @@ namespace IoT_RaspberryServer.Services
             this.Sprinklers = this._liteDb.GetAll();
         }
 
-        public void DeleteSprinkleTime(Sprinkler sprinkler, DateTime key)
+        public void DeleteSprinkleTime(Sprinkler sprinkler, string key)
         {
-            sprinkler.SprinkleTimeDict.Remove(key);
+            SprinklerDateTime elemToDelete = sprinkler.SprinkleTimeList.Find(x => x.ParsedDateTime == key);
+
+            if(elemToDelete != null)
+            {
+                sprinkler.SprinkleTimeList.Remove(elemToDelete);
+                this._liteDb.UpdateData(sprinkler);
+                this.Sprinklers = this._liteDb.GetAll();
+            }            
+        }
+
+        public void DeleteSprinkleTime(Sprinkler sprinkler, SprinklerDateTime entryToDelete)
+        {
+            sprinkler.SprinkleTimeList.Remove(entryToDelete);
             this._liteDb.UpdateData(sprinkler);
             this.Sprinklers = this._liteDb.GetAll();
         }
 
-        public void AddSprinkleTime(Sprinkler sprinkler, DateTime key, uint value)
+        public void AddSprinkleTime(Sprinkler sprinkler, DateTime dateTime, uint duration)
         {
-            sprinkler.SprinkleTimeDict.Add(key, value);
-            this._liteDb.UpdateData(sprinkler);
-            this.Sprinklers = this._liteDb.GetAll();
-        }
+            sprinkler.SprinkleTimeList.Add(new SprinklerDateTime
+            {
+                WateringDateTime = dateTime,
+                WateringDuration = duration
+            });
 
-        public void AddSprinkleTime(Sprinkler sprinkler, KeyValuePair<DateTime, uint> keyValuePair)
-        {
-            sprinkler.SprinkleTimeDict.Add(keyValuePair.Key, keyValuePair.Value);
             this._liteDb.UpdateData(sprinkler);
             this.Sprinklers = this._liteDb.GetAll();
         }

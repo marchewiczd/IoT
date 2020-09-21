@@ -44,12 +44,12 @@
                         <RadzenButton Icon="delete_forever" Click="@(args => DeleteSprinkler(@sprinkle))" ButtonStyle="ButtonStyle.Warning" Text="@L["Del"]" Style="margin-top: 20px; width: 150px" />
                     </div>
                     <div class="col-md-6">
-                        @if (sprinkle.SprinkleTimeDict.Any())
+                        @if (sprinkle.SprinkleTimeList.Any())
                         {
                             <div>@L["NextWater"]</div>
-                            <b>@($"{sprinkle.SprinkleTimeDict.First().Key:HH:mm:ss}")</b> <!-- TODO: fix to show actual next sprinkle -->
+                            <b>@($"{sprinkle.SprinkleTimeList.First().ParsedDateTime}")</b> <!-- TODO: fix to show actual next sprinkle -->
                             <div style="margin-top:20px">@L["NextDuration"]</div>
-                            <b>@($"{sprinkle.SprinkleTimeDict.First().Value} min")</b> <!-- TODO: fix to show actual next sprinkle -->
+                            <b>@($"{sprinkle.SprinkleTimeList.First().WateringDuration} min")</b> <!-- TODO: fix to show actual next sprinkle -->
                             <div style="margin-top:20px">@L["LastSuccessful"]</div>
                             <b>@($"{sprinkle.LastSuccessfulSprinkle:HH:mm:ss}")</b>
                         }
@@ -65,7 +65,6 @@
 
                         <div style="margin-top:20px">@L["Status"]</div>
                         <b style="@(sprinkle.SprinkleStatus ? "color:green" : "color:red")">@ParseStatus(sprinkle.SprinkleStatus)</b>
-
                     </div>
                 </div>
             </RadzenCard>
