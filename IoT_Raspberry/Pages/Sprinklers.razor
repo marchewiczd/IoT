@@ -6,65 +6,78 @@
 @using Services;
 
 @inject DialogService dialogService
-@inject SprinklerService sprinklerService 
+@inject SprinklerService sprinklerService
+@inject IStringLocalizer<Sprinklers> L
 
-    <div class="row">
-        <RadzenButton Style="margin-top: 40px;" Text=@($"Dodaj/usun zraszacz") Click="@(args => dialogService.Open<Dialog.AddSprinkleDialog>($"Add new sprinkler", null, new DialogOptions(){ Width = "700px", Height = "370px" }))" />
+<h1>@L["Sprinklers"]</h1>
+<hr />
+<div class="row">
+    <RadzenButton Style="margin-top: 40px;" Text=@(L["AddDel"]) Click="@(args => dialogService.Open<Dialog.AddSprinkleDialog>(L["AddSprink"], null, new DialogOptions(){ Width = "700px", Height = "370px" }))" />
 
-        @if (Debugger.IsAttached)
-        {
-            <RadzenButton Style="margin-top: 40px; margin-left: 20px" Text=@($"Clear all saved sprinklers") Click="@(args => sprinklerService.ClearSprinklers())" />
-        }
-    </div>
+    @if (Debugger.IsAttached)
+    {
+        <RadzenButton Style="margin-top: 40px; margin-left: 20px" Text=@(L["ClearAll"]) Click="@(args => sprinklerService.ClearSprinklers())" />
+    }
+</div>
 <hr>
 <div class="row">
-    @foreach (var sprinkle in sprinklerService.Sprinklers)
+    @if (sprinklerService.Sprinklers.Any())
     {
-        <RadzenCard Style="width:48%;height:300px;margin-right:2%;margin-top:2%">
-            <div class="row">
-                <div class="col-md-6">
-                    <div>Opis:</div>
-                    <b>@sprinkle.Description</b>
-                    <br />
-                    <RadzenButton Style="margin-top: 40px;" Text=@($"Dodaj/usun podlewanie") Click="@(args => dialogService.Open<Dialog.ModSprinkleDialog>($"Sprinkler ID: {sprinkle.Id}",
+        @foreach (var sprinkle in sprinklerService.Sprinklers)
+        {
+            <RadzenCard Style="width:48%;height:300px;margin-right:2%;margin-top:2%">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div>@L["Desc"]</div>
+                        <b>@sprinkle.Description</b>
+                        <br />
+                        <RadzenButton Style="margin-top: 40px;" Text=@(L["AddDelWatering"]) Click="@(args => dialogService.Open<Dialog.ModSprinkleDialog>($"{L["SprinklerId"]} {sprinkle.Id}",
                             new Dictionary<string, object>() { { "SprinklerId", sprinkle.Id } },
                             new DialogOptions(){ Width = "700px", Height = "550px" }))" />
-                    <br />
-                    <RadzenButton Click="@(args => 
-                                           { 
+                        <br />
+                        <RadzenButton Click="@(args =>
+                                           {
                                                 sprinklerService.ToggleSprinkler(@sprinkle);
                                                 StateHasChanged();
-                                           })" Text="On/off" Style="margin-top: 20px; width: 150px" />
-                    <br />
-                    <RadzenButton Icon="delete_forever" Click="@(args => DeleteSprinkler(@sprinkle))" ButtonStyle="ButtonStyle.Warning" Text="Usun" Style="margin-top: 20px; width: 150px" />
-                </div>
-                <div class="col-md-6">
-                    @if (sprinkle.SprinkleTimeDict.Any())
-                    {
-                        <div>Nastepne podlewanie:</div>
-                        <b>@($"{sprinkle.SprinkleTimeDict.First().Key:HH:mm:ss}")</b> <!-- TODO: fix to show actual next sprinkle -->
-                        <div style="margin-top:20px">Czas nastepnego podlewania:</div>
-                        <b>@($"{sprinkle.SprinkleTimeDict.First().Value} min")</b> <!-- TODO: fix to show actual next sprinkle -->
-                        <div style="margin-top:20px">Ostatnie udane podlewanie:</div>
-                        <b>@($"{sprinkle.LastSuccessfulSprinkle:HH:mm:ss}")</b>
-                    }
-                    else
-                    {
-                        <div>Nastepne podlewanie:</div>
-                        <b style="color:red">No sprinkles defined</b>
-                        <div style="margin-top:20px">Czas nastepnego podlewania:</div>
-                        <b style="color:red">No sprinkles defined</b>
-                        <div style="margin-top:20px">Ostatnie udane podlewanie:</div>
-                        <b style="color:red">No sprinkles defined</b>
-                    }
+                                           })" Text="@L["OnOff"]" Style="margin-top: 20px; width: 150px" />
+                        <br />
+                        <RadzenButton Icon="delete_forever" Click="@(args => DeleteSprinkler(@sprinkle))" ButtonStyle="ButtonStyle.Warning" Text="@L["Del"]" Style="margin-top: 20px; width: 150px" />
+                    </div>
+                    <div class="col-md-6">
+                        @if (sprinkle.SprinkleTimeDict.Any())
+                        {
+                            <div>@L["NextWater"]</div>
+                            <b>@($"{sprinkle.SprinkleTimeDict.First().Key:HH:mm:ss}")</b> <!-- TODO: fix to show actual next sprinkle -->
+                            <div style="margin-top:20px">@L["NextDuration"]</div>
+                            <b>@($"{sprinkle.SprinkleTimeDict.First().Value} min")</b> <!-- TODO: fix to show actual next sprinkle -->
+                            <div style="margin-top:20px">@L["LastSuccessful"]</div>
+                            <b>@($"{sprinkle.LastSuccessfulSprinkle:HH:mm:ss}")</b>
+                        }
+                        else
+                        {
+                            <div>@L["NextWater"]</div>
+                            <b style="color:red">@L["NoWatering"]</b>
+                            <div style="margin-top:20px">@L["NextDuration"]</div>
+                            <b style="color:red">@L["NoWatering"]</b>
+                            <div style="margin-top:20px">@L["LastSuccessful"]</div>
+                            <b style="color:red">@L["NoWatering"]</b>
+                        }
 
-                    <div style="margin-top:20px">Status:</div>
-                    <b style="@(sprinkle.SprinkleStatus ? "color:green" : "color:red")">@ParseStatus(sprinkle.SprinkleStatus)</b>
+                        <div style="margin-top:20px">@L["Status"]</div>
+                        <b style="@(sprinkle.SprinkleStatus ? "color:green" : "color:red")">@ParseStatus(sprinkle.SprinkleStatus)</b>
 
+                    </div>
                 </div>
-            </div>
-        </RadzenCard>
+            </RadzenCard>
+        }
     }
+    else
+    {
+        <div style="align-items:center">
+            <b style="color:red">@L["NoSprinkles"]</b>
+        </div>
+    }
+
 </div>
 
 @code {
@@ -75,7 +88,7 @@
 
         if (Debugger.IsAttached && !sprinklerService.Sprinklers.Any())
         {
-            foreach(var entry in Data.Sprinklers)
+            foreach (var entry in Data.Sprinklers)
             {
                 sprinklerService.AddSprinkler(entry);
             }
@@ -84,12 +97,12 @@
 
     string ParseStatus(bool sprinkleStatus)
     {
-        return sprinkleStatus ? "On" : "Off";
+        return sprinkleStatus ? L["On"] : L["Off"];
     }
 
     async void DeleteSprinkler(Sprinkler sprinkler)
     {
-        bool? result = await dialogService.Confirm("Are you sure?", "Delete", new ConfirmOptions() { OkButtonText = "Yes", CancelButtonText = "No" });
+        bool? result = await dialogService.Confirm(L["Confirm"], L["Del"], new ConfirmOptions() { OkButtonText = L["Yes"], CancelButtonText = L["No"] });
 
         if (result == true)
         {
