@@ -1,4 +1,6 @@
-﻿<div class="top-row pl-4 navbar navbar-dark">
+﻿@inject IStringLocalizer<NavMenu> L
+
+<div class="top-row pl-4 navbar navbar-dark">
     <a class="navbar-brand" href="">@Data.Names.AppName</a>
     <button class="navbar-toggler" @onclick="ToggleNavMenu">
         <span class="navbar-toggler-icon"></span>
@@ -9,17 +11,17 @@
     <ul class="nav flex-column">
         <li class="nav-item px-3">
             <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="oi oi-home" aria-hidden="true"></span> Strona Główna
+                <span class="oi oi-home" aria-hidden="true"></span> @L["Home"]
             </NavLink>
         </li>
         <li class="nav-item px-3">
             <NavLink class="nav-link" href="sprinklers">
-                <span class="oi oi-droplet" aria-hidden="true"></span> Zraszacze
+                <span class="oi oi-droplet" aria-hidden="true"></span> @L["Sprinklers"]
             </NavLink>
         </li>
         <li class="nav-item px-3">
             <NavLink class="nav-link" href="forecast">
-                <span class="oi oi-sun" aria-hidden="true"></span> Prognoza pogody
+                <span class="oi oi-sun" aria-hidden="true"></span> @L["Forecast"]
             </NavLink>
         </li>
     </ul>

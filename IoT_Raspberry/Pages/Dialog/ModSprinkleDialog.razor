@@ -6,31 +6,27 @@
 @inject DialogService dialogService
 @inject NotificationService notificationService
 @inject SprinklerService sprinklerService
+@inject IStringLocalizer<ModSprinkleDialog> L
 
 
 <RadzenCard Style="margin-bottom: 20px; height: 375px;">
-    <div class="row" style="height:85%">pecirecovery
+    <div class="row" style="height:85%">
         <div class="col-md-6">
-            <div>Opis:</div>
+            <div>@L["Desc"]</div>
             <b>@sprinkler.Description</b>
             <br />
             <br />
-            <div>Pin GPIO:</div>
+            <div>@L["GpioPin"]</div>
             <b>@sprinkler.GpioPin</b>
             <br />
             <br />
-            <div>Godzina:</div>
+            <div>@L["Time"]</div>
             <RadzenDatePicker @bind-Value="sprinkleTime" TValue="DateTime" ShowTime="true" TimeOnly="true" ShowSeconds="true" DateFormat="HH:mm:ss" Change="@(args => Change())" />
-            <div>Czas(w minutach):</div>
+            <div>@L["Duration"]</div>
             <RadzenNumeric @bind-Value="sprinkleLength" TValue="uint" Max="60" Min="1" Step="5" Style="margin-bottom: 20px" Change="@(args => Change())" />
             <!-- buttons -->
-<<<<<<< Updated upstream
-            <RadzenButton Click="@(args => Add())" Text="Add" Style="margin-top: 20px; width: 125px" />
-            <RadzenButton Click="@(args => DeleteSelected())" Text="Delete" Style="margin-top: 20px; width: 125px" />
-=======
             <RadzenButton Click="@(args => Add())" Text="@L["Add"]" Style="margin-top: 20px; width: 125px" />
             <RadzenButton ButtonStyle="ButtonStyle.Warning" Click="@(args => DeleteSelected())" Text="@L["Del"]" Style="margin-top: 20px; width: 125px" />
->>>>>>> Stashed changes
         </div>
         <div class="col-md-6">
             @if (sprinkler.SprinkleTimeList.Any())
@@ -44,14 +40,14 @@
             }
             else
             {
-                <b style="color:red">No sprinkles defined</b>
+                <b style="color:red">@L["NoSprinkles"]</b>
             }
         </div>
     </div>
 </RadzenCard>
 <div class="row">
     <div class="col-md-12">
-        <RadzenButton Click="@((args) => dialogService.Close(true))" Text="OK" Style="margin-bottom: 10px; width: 150px" />
+        <RadzenButton Click="@((args) => dialogService.Close(true))" Text="@L["Ok"]" Style="margin-bottom: 10px; width: 150px" />
     </div>
 </div>
 
@@ -85,7 +81,7 @@
     {
         if (selectedRow == null)
         {
-            ShowNotification(new NotificationMessage() { Severity = NotificationSeverity.Warning, Summary = "Uwaga!", Detail = "Brak elementow do usuniecia. Sprawdz czy zostaly zaznaczone elementy do usuniecia z listy obok.", Duration = popupDurationMs });
+            ShowNotification(new NotificationMessage() { Severity = NotificationSeverity.Warning, Summary = L["Warn"], Detail = L["DelEmpty"], Duration = popupDurationMs });
             return;
         }
 
@@ -93,13 +89,7 @@
         selectedRow = null;
         sprinkler = sprinklerService.Sprinklers.Find(spr => spr.Id == SprinklerId);
 
-<<<<<<< Updated upstream
-        ShowNotification(new NotificationMessage() { Severity = NotificationSeverity.Success, Summary = "Sukces!", Detail = "Element zostal usuniety!", Duration = popupDurationMs });
-        multipleValues = new List<string>();
-
-=======
         ShowNotification(new NotificationMessage() { Severity = NotificationSeverity.Success, Summary = L["Success"], Detail = L["DelSuccess"], Duration = popupDurationMs });
->>>>>>> Stashed changes
         StateHasChanged();
     }
 
@@ -117,28 +107,17 @@
             }
             else
             {
-<<<<<<< Updated upstream
-                ShowNotification(new NotificationMessage() { Severity = NotificationSeverity.Warning, Summary = "Uwaga!", Detail = "Taki wpis juz istnieje! Nie mozesz dodac takiego samego czasu kilkukrotnie.", Duration = popupDurationMs });
-                return;
-=======
                 sprinklerService.AddSprinkleTime(sprinkler, (DateTime)sprinkleTime, (uint)sprinkleLength);
->>>>>>> Stashed changes
             }
         }
         else
         {
-            ShowNotification(new NotificationMessage() { Severity = NotificationSeverity.Error, Summary = "Blad!", Detail = "Czas nie zostal podany! Sprawdz czy podales(as) czas i dlugosc zraszania.", Duration = popupDurationMs });
+            ShowNotification(new NotificationMessage() { Severity = NotificationSeverity.Error, Summary = L["Error"], Detail = L["NoDura"], Duration = popupDurationMs });
             return;
         }
 
-<<<<<<< Updated upstream
-        ShowNotification(new NotificationMessage() { Severity = NotificationSeverity.Success, Summary = "Sukces!\n", Detail = "Nowy czas zostal dodany", Duration = popupDurationMs });
-
-=======
-        ShowNotification(new NotificationMessage() { Severity = NotificationSeverity.Success, Summary = L["Success"], Detail = L["TimeAdded"], Duration = popupDurationMs });
-        
+        ShowNotification(new NotificationMessage() { Severity = NotificationSeverity.Success, Summary = L["Success"], Detail = L["TimeAdded"], Duration = popupDurationMs });      
         sprinkler = sprinklerService.Sprinklers.Find(spr => spr.Id == SprinklerId);
->>>>>>> Stashed changes
         StateHasChanged();
     }
 

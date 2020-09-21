@@ -11,6 +11,8 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using IoT_RaspberryServer.Services;
+using System.Collections.Generic;
+using System.Globalization;
 
 namespace IoT_RaspberryServer
 {
@@ -44,6 +46,14 @@ namespace IoT_RaspberryServer
             // Project services
             services.AddSingleton<WeatherForecastService>();
             services.AddSingleton<SprinklerService>();
+
+            // Localization
+            services.AddLocalization(options => options.ResourcesPath = "Resources");
+            services.Configure<RequestLocalizationOptions>(options =>
+            {
+                options.DefaultRequestCulture = new Microsoft.AspNetCore.Localization.RequestCulture("en");
+                options.SupportedUICultures = AppSettings.SupportedCultures;
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -57,6 +67,8 @@ namespace IoT_RaspberryServer
             {
                 app.UseExceptionHandler("/Error");
             }
+
+            app.UseRequestLocalization();
 
             app.UseStaticFiles();
 

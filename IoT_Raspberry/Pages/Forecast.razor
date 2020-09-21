@@ -2,11 +2,14 @@
 
 @using IoT_RaspberryServer.Services
 @using IoT_RaspberryServer.Data
-@inject WeatherForecastService ForecastService
 
-<h1>Weather forecast</h1>
-<button disabled="@HourlyDisabled" class="btn btn-primary" @onclick="GetHourlyForecast_Click">Hourly</button>
-<button disabled="@DailyDisabled" class="btn btn-primary" @onclick="GetDailyForecast_Click">Daily</button>
+@inject WeatherForecastService ForecastService
+@inject IStringLocalizer<Forecast> L
+
+<h1>@L["Forecast"]</h1>
+<hr />
+<RadzenButton Disabled="@HourlyDisabled" Click="@((args) => GetHourlyForecast_Click())" Text="@L["Hourly"]" Style="margin-bottom: 20px; width: 150px" />
+<RadzenButton Disabled="@DailyDisabled" Click="@((args) => GetDailyForecast_Click())" Text="@L["Daily"]" Style="margin-bottom: 20px; width: 150px" />
 
 @if (forecasts == null)
 {
@@ -17,12 +20,12 @@ else
     <table class="table">
         <thead>
             <tr>
-                <th>Date</th>
-                <th>Weather</th>
-                <th>Temp. (C)</th>
-                <th>Feels like Temp.</th>
-                <th>Humidity</th>
-                <th>Pressure</th>
+                <th>@L["Date"]</th>
+                <th>@L["Weather"]</th>
+                <th>@L["Temp"]</th>
+                <th>@L["FeelsLike"]</th>
+                <th>@L["Humidity"]</th>
+                <th>@L["Pressure"]</th>
             </tr>
         </thead>
         <tbody>
@@ -53,11 +56,9 @@ else
 
     private void GetWeatherData()
     {
-        Console.WriteLine("Daily forecast...");
         forecasts = null;
         System.Threading.Thread.Sleep(100);
         forecasts = ForecastService.GetForecast();
-        Console.WriteLine("Done!");
     }
 
     private async void GetDailyForecast_Click()
@@ -80,21 +81,15 @@ else
 
     private void GetDailyForecast()
     {
-
-        Console.WriteLine("Daily forecast...");
         System.Threading.Thread.Sleep(500);
         forecasts = ForecastService.GetDailyForecast();
-        Console.WriteLine("Done!");
         InvokeAsync(this.StateHasChanged);
     }
 
     private void GetHourlyForecast()
     {
-
-        Console.WriteLine("Hourly forecast...");
         System.Threading.Thread.Sleep(500);
         forecasts = ForecastService.GetHourlyForecast();
-        Console.WriteLine("Done!");
         InvokeAsync(this.StateHasChanged);
     }
 }
