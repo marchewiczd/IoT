@@ -1,5 +1,6 @@
 ﻿@page "/forecast"
 
+@using System.Globalization
 @using IoT_RaspberryServer.Services
 @using IoT_RaspberryServer.Data
 
@@ -32,7 +33,7 @@ else
             @foreach (var forecast in forecasts)
             {
                 <tr>
-                    <td>@forecast.Date.ToString("dd MMMM, HH:mm")</td>
+                    <td>@forecast.Date.ToString("dd MMMM, HH:mm", CultureInfo.CurrentUICulture)</td>
                     <td><img src="@forecast.IconAddress" />@forecast.Weather</td>
                     <td>@forecast.Temp</td>
                     <td>@forecast.FeelsLikeTemp</td>

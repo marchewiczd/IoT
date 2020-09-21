@@ -6,13 +6,14 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using IoT_Api.Helpers;
 using IoT_RaspberryServer.Data;
+using System.Globalization;
 
 namespace IoT_RaspberryServer.Services
 {
     public class WeatherForecastService
     {
         // TODO: add possibility of configuration(.json?)
-        private const string ApiUri = "https://api.openweathermap.org/data/2.5/onecall?lat=54.352051&lon=18.64637&lang=pl&units=metric&exclude=minutely&appid=";
+        private const string ApiUri = "https://api.openweathermap.org/data/2.5/onecall?lat=54.352051&lon=18.64637&units=metric&exclude=minutely";
 
         private HttpClient httpClient = new HttpClient();
 
@@ -165,7 +166,7 @@ namespace IoT_RaspberryServer.Services
 
         private Task<string> GetWeatherJsonData()
         {
-            var response = httpClient.GetAsync(ApiUri + AppSettings.OpenWeatherApiKey);
+            var response = httpClient.GetAsync(this.GetApiRequestUrl());
 
             switch (response.Result.StatusCode)
             {
@@ -183,6 +184,11 @@ namespace IoT_RaspberryServer.Services
         private string GetWeatherIconAddress(string iconId)
         {
             return $"http://openweathermap.org/img/wn/{iconId}.png";
+        }
+
+        private string GetApiRequestUrl()
+        {
+            return ApiUri + $"&appid={AppSettings.OpenWeatherApiKey}" + $"&lang={CultureInfo.CurrentUICulture}";
         }
     }
 
