@@ -48,7 +48,7 @@
             return;
         }
 
-        if (gpioPin == 0)
+        if (gpioPin <= 0 || gpioPin >= 28)
         {
             ShowNotification(new NotificationMessage() { Severity = NotificationSeverity.Error, Summary = L["Error"], Detail = L["NoGpioPin"], Duration = popupDurationMs });
             return;
@@ -60,10 +60,9 @@
             return;
         }
 
-        sprinklerService.AddSprinkler(new Sprinkler()
+        sprinklerService.AddSprinkler(new SprinklerData(gpioPin)
         {
-            Description = desc,
-            GpioPin = gpioPin
+            Description = desc
         });
 
         dialogService.Close(true);

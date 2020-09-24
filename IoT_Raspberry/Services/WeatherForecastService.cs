@@ -17,16 +17,16 @@ namespace IoT_RaspberryServer.Services
 
         private HttpClient httpClient = new HttpClient();
 
-        public List<WeatherForecast> GetForecast()
+        public List<WeatherData> GetForecast()
         {
-            List<WeatherForecast> forecastList = new List<WeatherForecast>();
+            List<WeatherData> forecastList = new List<WeatherData>();
             string json = this.GetWeatherJsonData().Result;
 
             dynamic deserializedJson = JsonConvert.DeserializeObject(json);
 
             foreach (var hourForecast in deserializedJson.hourly)
             {
-                forecastList.Add(new WeatherForecast
+                forecastList.Add(new WeatherData
                 {
                     Date = DateTimeHelpers.ConvertFromUnixTime((double)hourForecast.dt.Value),
                     FeelsLikeTemp = (double)hourForecast.feels_like.Value,
@@ -42,7 +42,7 @@ namespace IoT_RaspberryServer.Services
             return forecastList;
         }
 
-        public List<WeatherForecast> Forecasts = new List<WeatherForecast>();
+        public List<WeatherData> Forecasts = new List<WeatherData>();
 
         public string LastUpdateTime { get; private set; }
 
@@ -74,16 +74,16 @@ namespace IoT_RaspberryServer.Services
         },
         */
 
-        public List<WeatherForecast> GetHourlyForecast()
+        public List<WeatherData> GetHourlyForecast()
         {
-            List<WeatherForecast> forecastList = new List<WeatherForecast>();
+            List<WeatherData> forecastList = new List<WeatherData>();
             string json = this.GetWeatherJsonData().Result;
 
             dynamic deserializedJson = JsonConvert.DeserializeObject(json);
 
             foreach (var hourForecast in deserializedJson.hourly)
             {
-                forecastList.Add(new WeatherForecast
+                forecastList.Add(new WeatherData
                 {
                     Date = DateTimeHelpers.ConvertFromUnixTime((double)hourForecast.dt.Value),
                     FeelsLikeTemp = (double)hourForecast.feels_like.Value,
@@ -139,16 +139,16 @@ namespace IoT_RaspberryServer.Services
         },
         */
 
-        public List<WeatherForecast> GetDailyForecast()
+        public List<WeatherData> GetDailyForecast()
         {
-            List<WeatherForecast> forecastList = new List<WeatherForecast>();
+            List<WeatherData> forecastList = new List<WeatherData>();
             string json = this.GetWeatherJsonData().Result;
 
             dynamic deserializedJson = JsonConvert.DeserializeObject(json);
 
             foreach (var dailyForecast in deserializedJson.daily)
             {
-                forecastList.Add(new WeatherForecast
+                forecastList.Add(new WeatherData
                 {
                     Date = DateTimeHelpers.ConvertFromUnixTime((double)dailyForecast.dt.Value),
                     FeelsLikeTemp = (double)dailyForecast.feels_like.day.Value,

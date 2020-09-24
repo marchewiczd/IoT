@@ -1,9 +1,48 @@
 ﻿@page "/"
 
+@using Microsoft.AspNetCore.Builder
+@using Microsoft.AspNetCore.Localization
+@using Microsoft.Extensions.Options
+@using System.Globalization;
+@using IoT_RaspberryServer.Data
 
+@inject IOptions<RequestLocalizationOptions> LocOptions
 @inject IStringLocalizer<Index> L
 
 <h1>@L["Home"]</h1>
 <hr />
 
 Welcome to your new app.
+<br />
+<RadzenButton Click="@((args) => Test1())" Text="Get Info" Style="margin-bottom: 20px; width: 300px" /><br />
+<RadzenButton Click="@((args) => ChangeLang())" Text="Change Language" Style="margin-bottom: 20px; width: 300px" /><br />
+
+
+
+
+
+
+@code {
+    void Test1()
+    {
+        Console.WriteLine($"Default request culture: {LocOptions.Value.DefaultRequestCulture.Culture.Name}");
+        Console.WriteLine($"Default request UI culture: {LocOptions.Value.DefaultRequestCulture.UICulture.Name}");
+        Console.WriteLine($"Cookie requset culture: {CookieRequestCultureProvider.DefaultCookieName}");
+        Console.WriteLine($"System.Globalization.CultureInfo.CurrentCulture: {CultureInfo.CurrentCulture}");
+        Console.WriteLine($"CultureInfo.CurrentUICulture: {CultureInfo.CurrentUICulture}");
+    }
+
+    void ChangeLang()
+    {
+        if(CultureInfo.CurrentUICulture.Name == "pl")
+        {
+            CultureInfo.CurrentUICulture = AppSettings.SupportedCultures[0];
+        }
+        else
+        {
+            CultureInfo.CurrentUICulture = AppSettings.SupportedCultures[1];
+        }
+
+        StateHasChanged();
+    }
+}

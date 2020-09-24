@@ -1,9 +1,10 @@
 ﻿using IoT_RaspberryControlApi.GPIO.Controllers;
+using System;
 using System.Device.Gpio;
 
 namespace IoT_RaspberryControlApi.Templates
 {
-    public abstract class GpioAddonTemplate
+    public abstract class GpioAddonTemplate : IDisposable
     {
         protected int gpioPin;
 
@@ -15,6 +16,11 @@ namespace IoT_RaspberryControlApi.Templates
             this.pinMode = pinMode;
 
             PiGpioController.OpenPin(gpioPin, pinMode);
+        }
+
+        public void Dispose()
+        {
+            PiGpioController.ClosePin(this.gpioPin);
         }
     }
 }

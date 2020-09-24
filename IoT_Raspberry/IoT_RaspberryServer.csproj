@@ -11,12 +11,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Extensions\" />
     <Folder Include="wwwroot\images\" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\IoT_Api\IoT_Api.csproj" />
+    <ProjectReference Include="..\IoT_RaspberryControlApi\IoT_RaspberryControlApi.csproj" />
   </ItemGroup>
 
 </Project>

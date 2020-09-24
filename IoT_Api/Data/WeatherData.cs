@@ -2,7 +2,7 @@ using System;
 
 namespace IoT_RaspberryServer.Data
 {
-    public class WeatherForecast
+    public class WeatherData
     {
         public DateTime Date { get; set; }
 

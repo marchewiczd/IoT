@@ -13,6 +13,8 @@ using System.Linq;
 using IoT_RaspberryServer.Services;
 using System.Collections.Generic;
 using System.Globalization;
+using IoT_RaspberryControlApi.GPIO.Controllers;
+using LiteDB;
 
 namespace IoT_RaspberryServer
 {
@@ -20,6 +22,9 @@ namespace IoT_RaspberryServer
     {
         public Startup(IConfiguration configuration)
         {
+            PiGpioController.Initialize();
+            PiActionController.Initialize();
+
             if (Debugger.IsAttached)
             {
                 LoadTempData();
@@ -85,10 +90,9 @@ namespace IoT_RaspberryServer
         {
             for (int i = 0; i < 10; i++)
             {
-                Data.Data.Sprinklers.Add(new Sprinkler
+                Data.Data.Sprinklers.Add(new SprinklerData(123)
                 {
                     Description = "Im a sprinkler test123",
-                    GpioPin = 123,
                     LastSuccessfulSprinkle = new DateTime(2020, 9, 14, 14, 56, 12),
                     SkipNextSprinkle = false,
                     SprinkleStatus = false

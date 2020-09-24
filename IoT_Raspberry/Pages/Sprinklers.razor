@@ -1,7 +1,6 @@
 ﻿@page "/sprinklers"
 
 @using System.Diagnostics;
-
 @using Data;
 @using Services;
 
@@ -85,13 +84,13 @@
         dialogService.OnOpen += Open;
         dialogService.OnClose += Close;
 
-        if (Debugger.IsAttached && !sprinklerService.Sprinklers.Any())
-        {
-            foreach (var entry in Data.Sprinklers)
-            {
-                sprinklerService.AddSprinkler(entry);
-            }
-        }
+        //if (Debugger.IsAttached && !sprinklerService.Sprinklers.Any())
+        //{
+        //    foreach (var entry in Data.Sprinklers)
+        //    {
+        //        sprinklerService.AddSprinkler(entry);
+        //    }
+        //}
     }
 
     string ParseStatus(bool sprinkleStatus)
@@ -99,7 +98,7 @@
         return sprinkleStatus ? L["On"] : L["Off"];
     }
 
-    async void DeleteSprinkler(Sprinkler sprinkler)
+    async void DeleteSprinkler(SprinklerData sprinkler)
     {
         bool? result = await dialogService.Confirm(L["Confirm"], L["Del"], new ConfirmOptions() { OkButtonText = L["Yes"], CancelButtonText = L["No"] });
 

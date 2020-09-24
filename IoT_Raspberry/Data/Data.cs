@@ -4,6 +4,6 @@ namespace IoT_RaspberryServer.Data
 {
     public static class Data
     {
-        public static List<Sprinkler> Sprinklers = new List<Sprinkler>();
+        public static List<SprinklerData> Sprinklers = new List<SprinklerData>();
     }
 }
