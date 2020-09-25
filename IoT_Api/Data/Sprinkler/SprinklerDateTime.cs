@@ -23,5 +23,7 @@ namespace IoT_RaspberryServer.Data
         public string ParsedDateTime { get; private set; }
 
         public uint WateringDuration { get; set; }
+
+        public DateTime ExpectedSprinkleEnd { get => this._wateringDateTime.AddMinutes(this.WateringDuration); }
     }
 }
